@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+	<meta charset="utf-8">
+	<title>My Quiz App</title>
+	<link rel="icon" type="image/x-icon" href="styles/icons/icon2.ico">
+	<link href="styles/Style.css" rel="stylesheet">
+	
+	<script src="rating/rating.js"></script>
+	<script src="translations/Translations.js"></script>
+	<script src="effects/effects.js"></script>
+	
+	<script src="searchbar/search.js"></script>
+	<script src="searchbar/keycode.js"></script>
+	
+	<script src="profileMenu/profileMenu.js"></script>
+	
+	<script>
+		const d = document;
+		
+		function init()
+		{
+			rotate('questionMark');
+			translate();
+		}
+
+		function translate()
+		{
+			loadCategories();
+			resetTopics();
+			switchContainers('topics') 
+			
+			var element = document.createElement('input');
+			element.type = 'hidden';
+			element.value = 'allTopics';
+			loadTopics(element); 
+			
+			d.getElementById('btnPlay').innerHTML = getTranslation('btnPlay');
+			d.getElementById('btnCreate').innerHTML = getTranslation('btnCreate');
+			d.getElementById('categoriesTitle').innerHTML = getTranslation('categoriesTitle');
+			d.getElementById('btnValidate').innerHTML = getTranslation('btnValidate');
+			d.getElementById('btnNextQuestion').innerHTML = getTranslation('btnNextQuestion');
+			d.getElementById('voteTitle').innerHTML = getTranslation('voteTitle');
+			d.getElementById('btnRestart').innerHTML = getTranslation('btnRestart');
+			d.getElementById('search').setAttribute('placeholder', getTranslation('search'));
+			d.getElementById('btnShowQuestionsStats').innerHTML = getTranslation('btnShowQuestionsStats');
+		}
+		
+		function loadUrlQuizId()
+		{
+			const queryString = window.location.search;
+			const urlParams = new URLSearchParams(queryString);
+			const quizId = urlParams.get('quizId')
+			
+			var sessionQuizId = sessionStorage.getItem('quizId');
+			
+			if (sessionQuizId == null)
+				return;
+				
+			sessionStorage.removeItem('quizId');
+			
+			var element = document.createElement('input');
+			element.type = 'hidden';
+			element.value = quizId;
+			loadQuiz(element);
+		}
+
+		/*
+		BEGIN CATEGORIES PANEL + TOPICS PANEL
+		*/
+
+		function callbackVote(e)
+		{
+			console.log('callbackVote');
+		
+			var value = e.getAttribute('value');
+			d.getElementById('voteTitle').innerHTML = getTranslation('voteLabel2').replace('{0}', value);
+			
+			const request = new XMLHttpRequest();
+			const url='http://localhost:5298/api/ranking';
+			const json = JSON.stringify(
+				{
+					QuizId: quizId, 
+					Value: value
+				});
+			request.open("POST", url);
+			request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+			request.send(json);
+		}
+		
+		function loadCategories()
+		{	
+			const request = new XMLHttpRequest();
+			const url='http://localhost:5298/api/categoriesFiltered/';
+			request.open("GET", url + getLang());
+			request.send();
+			request.onprogress = function(event) 
+			{
+				//console.log(`Loaded ${event.loaded} of ${event.total}`);
+			};
+			request.onload = function() 
+			{
+				var data = JSON.parse(request.response);
+				var html = '';
+				var nbTopics = 0;
+				for (i = 0; i < data.length; i++)
+				{
+					nbTopics += data[i].nbTopics;
+				}
+				
+				html += '<button id="btnCat" class="button" onclick="loadTopics(this)" value="allTopics">'+getTranslation('allTopics')+' ('+nbTopics+')</button><br>';
+				html += '<button id="btnCat" class="button" onclick="loadTopics(this)" value="topTen">'+getTranslation('topicsTopTen')+'</button><br>';
+				html += '<button id="btnCat" class="button" onclick="loadTopics(this)" value="random">'+getTranslation('topicRandom')+'</button><br>';
+
+				for (i = 0; i < data.length; i++)
+				{
+					html += '<button id="btnCat" class="button" onclick="loadTopics(this)" value="'+ data[i].id +'">'+ data[i].name +" ("+ data[i].nbTopics +")"+'</button><br>';
+				}
+				d.getElementById('categoriesSubContainer').innerHTML = html;
+			};
+			request.onerror = function() 
+			{
+				alert(getTranslation('dialogLoadingCatError'));
+			};
+		}
+		
+		var topics = null;
+		function loadTopics(e)
+		{		
+			switchContainers('topics');
+			
+			var id = e.getAttribute('value');
+			var lang = getLang();
+			var category = '';
+			
+			var url = '';
+			if (id == 'allTopics') //returns all topics  
+			{
+				url = "http://localhost:5298/api/topics/";
+				id = '';
+				category = getTranslation('allTopics');
+			}
+			else if (id == 'topTen') //returns top ten topics
+			{
+				url = "http://localhost:5298/api/topicstopten/";
+				id = '';
+				category = getTranslation('topicsTopTen'); 
+			}
+			else if (id == 'random') //returns top ten topics
+			{
+				url = "http://localhost:5298/api/topicsrandom/";
+				id = '';
+				category = getTranslation('topicRandom'); 
+			}
+			else //returns topics by catId
+			{
+				url = "http://localhost:5298/api/topics/";
+				id += '/';
+				category = e.innerHTML.substring(0, e.innerHTML.indexOf("("));
+			}
+			
+			const request = new XMLHttpRequest();
+			request.open("GET", url + id + getLang());
+			request.send();
+			request.onprogress = function(event) 
+			{
+				//console.log(`Loaded ${event.loaded} of ${event.total}`);
+			};
+			request.onload = function() 
+			{
+				var data = JSON.parse(request.response);
+				topics = data;
+				var html = '';
+				for (i = 0; i < data.length; i++)     
+				{
+					html += '<div class="topicContainer" value="'+ data[i].id +'" onclick="loadQuiz(this)"><span class="categorieLabel">'+ data[i].catName +'</span><span class="title2">'+ (i+1) +'. '+ data[i].name +'</span><br><p><span class="title3">'+ data[i].description;
+					html += '</span></p><span class="infos">'+getTranslation('topicQuestions')+': '+ data[i].nbQuestions +'</span><br><div class="ratingContainer" readonly="true" value="'+ data[i].ranking +'"></div><span class="infos">'+getTranslation('topicNote')+': '+ data[i].ranking +' </span></div>';
+				}
+				d.getElementById('topicsSubContainer').innerHTML = html;
+				initRatingContainers();
+				loadUrlQuizId();
+			};
+			request.onerror = function() 
+			{
+				//alert(getTranslation('dialogLoadingTopicsError'));
+			};
+			
+			d.getElementById('topicsTitle').innerHTML = category;
+			d.getElementById('col2').scrollTop = 0;
+		}
+		
+		function resetTopics()
+		{		
+			d.getElementById('topicsSubContainer').innerHTML = '';
+			d.getElementById('topicsTitle').innerHTML = '';
+		}
+		
+		function switchContainers(arg) 
+		{
+			if (arg == 'quiz')
+			{
+				d.getElementById("quizContainer").style.display = "block";	
+				d.getElementById("topicsContainer").style.display = "none";	
+				d.getElementById("quizSubContainer").style.display = "block";	
+				d.getElementById("statsContainer").style.display = "none";	
+			}
+			else if  (arg == 'topics')
+			{
+				d.getElementById("quizContainer").style.display = "none";	
+				d.getElementById("topicsContainer").style.display = "block";					
+			}
+			else if  (arg == 'stats')
+			{
+				/*TODO
+				d.getElementById("topicsContainer").style.display = "none";	
+				d.getElementById("quizSubContainer").style.display = "block";	
+				*/
+			}
+		}
+		
+		/*
+		BEGIN QUIZ PANEL
+		*/
+			
+		var quizId = null;
+		var ranking = 0;
+		var questions = 0;
+		var nbQuestions = 0;
+		var indexQuestion = 0;
+		var rightAnswer = '';
+		var stats = 0;
+		
+		var questionStatsArray = [];
+		class questionStats 
+		{
+			constructor(questionId, question, answerA, answerB, answerC, rightAnswer, givenAnswer)
+			{
+				this.questionId = questionId;
+				this.question = question;
+				this.answerA = answerA;
+				this.answerB = answerB;
+				this.answerC = answerC;
+				this.rightAnswer = rightAnswer;
+				this.givenAnswer = givenAnswer;
+			}
+		}
+
+		function loadQuiz(e)
+		{
+			switchContainers('quiz');
+			resetControls();
+			
+			quizId = null;
+			ranking = 0;
+			questions = 0;
+			nbQuestions = 0;
+			indexQuestion = 0;
+			rightAnswer = '';
+			stats = 0;
+			
+			quizId = e.getAttribute('value');
+			var quizTitle = getQuizTitle(quizId);
+			ranking = getQuizRanking(quizId);
+			
+			d.getElementById('quizTitle').innerHTML = quizTitle;
+			d.getElementById("voteValue").setAttribute('value', ranking);
+			
+			loadQuestions();
+		}
+		
+		function getQuizTitle(id)
+		{
+			var result = ''
+			topics.forEach(element => 
+			{
+				if (element.id == id) 
+				{
+					result = element.name;
+				}
+			});
+			return result;
+		}
+
+		function getQuizRanking(id)
+		{
+			var result = ''
+			topics.forEach(element => 
+			{
+				if (element.id == id) 
+				{
+					result = element.ranking;
+				}
+			});
+			return result;
+		}
+		
+		function loadQuestions()
+		{
+			const request = new XMLHttpRequest();
+			const url= "http://localhost:5298/api/questions/" + quizId;
+			request.open("GET", url);
+			request.send();
+			request.onprogress = function(event) 
+			{
+				//console.log(`Loaded ${event.loaded} of ${event.total}`);
+			};
+			request.onload = function() 
+			{
+				var data = JSON.parse(request.response);
+				questions = data;
+				nbQuestions = questions.length;
+				loadQuestion();
+			};
+			request.onerror = function() 
+			{
+				//alert(getTranslation('dialogLoadingQuestionsError'));
+			};
+		}
+		
+		function validate() 
+		{			  
+			var answer = d.querySelector('input[name="answer"]:checked').value;
+			
+			if (answer == 'd')
+				return;
+				
+			questionStatsArray.push(new questionStats(
+				indexQuestion+1, 
+				questions[indexQuestion].question1, 
+				questions[indexQuestion].answerA, 
+				questions[indexQuestion].answerB, 
+				questions[indexQuestion].answerC, 
+				questions[indexQuestion].rightAnswer, 
+				answer
+				));
+			
+			if (answer == rightAnswer)
+			{
+				d.getElementById('answer').innerHTML = getTranslation('rightAnswer2');
+				stats++;
+			}
+			else
+			{
+				d.getElementById('answer').innerHTML = getTranslation('wrongAnswer')+rightAnswer;
+			}
+			disableControls();
+		}
+		
+		function disableControls() 
+		{
+			document.getElementById('btnValidate').disabled = true;
+			document.getElementById('radio1').disabled = true;
+			document.getElementById('radio2').disabled = true;
+			document.getElementById('radio3').disabled = true;
+			document.getElementById('radio4').disabled = true;
+		}
+		
+		function resetControls() 
+		{
+			document.querySelector('#btnValidate').disabled = false;
+			document.getElementById('radio1').disabled = false;
+			document.getElementById('radio2').disabled = false;
+			document.getElementById('radio3').disabled = false;
+			document.getElementById('radio4').disabled = false;
+			document.getElementById("radio4").checked = true;
+			d.getElementById('answer').innerHTML = '&nbsp;';
+		}
+		
+		function loadQuestion() 
+		{	
+			d.getElementById('quizTitleQuestion').innerHTML = getTranslation('question2')+parseInt(indexQuestion+1);
+			d.getElementById('question').innerHTML = questions[indexQuestion].question1;
+			d.getElementById('answerA').innerHTML = questions[indexQuestion].answerA;
+			d.getElementById('answerB').innerHTML = questions[indexQuestion].answerB;
+			d.getElementById('answerC').innerHTML = questions[indexQuestion].answerC;
+			d.getElementById('btnNextQuestion').innerHTML = getTranslation('btnNextQuestion');
+			rightAnswer = questions[indexQuestion].rightAnswer;
+			setProgressbarValue();
+		}
+		
+		function resetQuestion() 
+		{	
+			d.getElementById('quizTitleQuestion').innerHTML = '&nbsp;';
+			d.getElementById('question').innerHTML = '&nbsp;';
+			d.getElementById('answerA').innerHTML = '&nbsp;';
+			d.getElementById('answerB').innerHTML = '&nbsp;';
+			d.getElementById('answerC').innerHTML = '&nbsp;';
+			d.getElementById('answer').innerHTML = '&nbsp;';
+			rightAnswer = '';
+			resetControls();
+		}
+		
+		async function setNextQuestion() 
+		{
+			setProgressbarValue();
+			resetQuestion();
+		
+			indexQuestion++;
+			if (indexQuestion == nbQuestions-1)
+			{
+				await fadeOut('quizSubContainer');
+				loadQuestion();
+				d.getElementById('btnNextQuestion').innerHTML = getTranslation('results');		
+				await fadeIn('quizSubContainer');
+			}
+			else if (indexQuestion <= nbQuestions-1)
+			{
+				await fadeOut('quizSubContainer');
+				loadQuestion();
+				d.getElementById('btnNextQuestion').innerHTML = getTranslation('btnNextQuestion');
+				await fadeIn('quizSubContainer');
+			}
+			else
+			{
+				await fadeOut('quizSubContainer');
+				loadStats();
+				await fadeIn('statsContainer');
+			}
+		}
+		
+		function loadStats() 
+		{
+			var percentage = Math.round(stats/indexQuestion*100);
+			d.getElementById('quizTitleQuestion').innerHTML = getTranslation('quizTitleQuestion2');
+			if (percentage < 50)
+			{
+				d.getElementById('congratulation').innerHTML = getTranslation('congratulation1');
+				d.getElementById('smiley').src = 'styles/icons/smileys/smiley1.png';
+			}
+			else if (percentage >= 50 && percentage <= 80)
+			{
+				d.getElementById('congratulation').innerHTML = getTranslation('congratulation2');
+				d.getElementById('smiley').src = 'styles/icons/smileys/smiley2.png';
+			}
+			else if (percentage > 80)
+			{
+				d.getElementById('congratulation').innerHTML = getTranslation('congratulation3');
+				d.getElementById('smiley').src = 'styles/icons/smileys/smiley3.png';
+			}
+			d.getElementById("quizSubContainer").style.display = "none";
+			d.getElementById("statsContainer").style.display = "block";	
+			d.getElementById('stats1').innerHTML = getTranslation('stats1').replace('{0}', stats);
+			d.getElementById('stats2').innerHTML = getTranslation('stats2').replace('{0}', percentage);
+			d.getElementById('voteTitle').innerHTML = getTranslation('voteTitle');
+			d.getElementById('voteLabel').innerHTML = getTranslation('voteLabel1').replace('{0}', ranking);
+			unsetRatingReadonly();
+		}
+		
+		function showQuestionsStats()
+		{
+			d.getElementById("statsSubContainer").style.display = "block";
+			
+			var html = '';
+		
+			var questionNum = getTranslation('questionNum');
+			var question = getTranslation('question');
+			var answerA = getTranslation('answerA');
+			var answerB = getTranslation('answerB');
+			var answerC = getTranslation('answerC');
+			var rightAnswer1 = getTranslation('rightAnswer1');
+		
+			for (var i = 0; i < questionStatsArray.length; i++)
+			{
+				html += '<table>';
+				html +=		'<tr>';
+				html +=			'<td style="width:110px"><span>'+questionNum+'</span></td><td><span>'+questionStatsArray[i].questionId+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+question+'</span></td><td><span>'+questionStatsArray[i].question+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+answerA+'</span></td><td><span>'+questionStatsArray[i].answerA+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+answerB+'</span></td><td><span>'+questionStatsArray[i].answerB+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+answerC+'</span></td><td><span>'+questionStatsArray[i].answerC+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+rightAnswer1+'</span></td><td><span>'+questionStatsArray[i].rightAnswer+'</span></td>';
+				html +=		'</tr><tr style="border-bottom: none">';
+				html +=			'<td><span>'+givenAnswer+'</span></td><td><span>'+questionStatsArray[i].givenAnswer+'</span></td>';
+				html +=		'</tr>';
+				html += '</table><br>';
+			}
+			d.getElementById('statsSubContainer').innerHTML = html;
+		}
+		
+		function setProgressbarValue()
+		{
+			var val = Math.round((indexQuestion+1) * (100/nbQuestions));
+			
+			if (val == Infinity)
+			{
+				//$("#progressbar").progressbar( { value: 0 } );
+				d.getElementById('pbLabel').innerHTML = getTranslation('progress')+'0%';
+			}
+			else
+			{
+				//$("#progressbar").progressbar( { value: val } );
+				d.getElementById('pbLabel').innerHTML = getTranslation('progress')+val+"%";
+			}
+		}
+		
+		function restartQuiz() 
+		{
+			rotate('questionMark');
+			
+			indexQuestion = -1;
+			stats = 0;
+
+			d.getElementById("quizSubContainer").style.display = "block";	
+			d.getElementById("statsContainer").style.display = "none";
+			d.getElementById('btnNextQuestion').innerHTML = getTranslation('btnNextQuestion');
+			setNextQuestion();
+		}
+		
+		/*
+		BEGIN Handle User Profil
+		*/
+				
+		var backgroundIndex = 1;
+		function setBackground()
+		{
+			var path = "'styles/backgrounds/bg"+backgroundIndex+".png'";
+			console.log(path);
+			document.body.style.backgroundImage = "url("+path+")"; 
+		}
+		
+		function handleBackground(e) 
+		{
+			var direction = e.getAttribute('value');
+			
+			if (direction == 'backward')
+			{
+				if (backgroundIndex > 1)
+					backgroundIndex--;
+			}
+			if (direction == 'forward')
+			{	
+				if (backgroundIndex < 100)
+					backgroundIndex++;
+			}
+			setBackground();
+		}
+
+	</script>
+	
+</head>
+
+<body onload="init()">
+
+	<div class="banner">
+		<div id="questionMark" class="questionMark"></div>
+		<span class="title">My Quiz App</span>&nbsp;<span id="version">V3</span>
+		<div class="right">
+			<a id="btnProfile" class="profileButton right" onclick="showProfileMenu()"><img src="styles/icons/profile2.png"></a>
+			<div id="profileMenu" class="hide" onmouseover="console.log('profileMenu')" onmouseleave="hideProfileMenu()">
+				<ul class="inline-block-list">
+					<li id="liProfile" onclick="showProfile()">Profile</li>   
+					<li id="liStats" onclick="showStats()">Stats</li>
+					<li id="liLogout" onclick="logout()">Déconnexion</li>
+				</ul>
+			</div>
+		</div>
+		<a id="btnLang" class="right" onclick="setLang('fr')">fr</a>
+		<a id="btnLang" class="right" onclick="setLang('de')">de</a>
+		<a class="smallButton right" value="forward" onclick="handleBackground(this)">&gt;</a>
+		<a class="smallButton right" value="backward" onclick="handleBackground(this)">&lt;</a>
+		
+		<br><br>
+		<a id="btnPlay" class="button" href="play.html">Jouer</a>
+		<a id="btnCreate" class="button" href="form.html">Créer quiz</a>
+		
+		<div class="right">
+			<input id="search" type="search" onKeyUp="showResults(this.value)" onfocus="searchFocus()" onfocusout="searchFocusOut(window.event)" placeholder="Search..." autocomplete="off" maxlength="50"/>
+			<div id="result" class="hide"></div>
+		</div>
+		
+	</div>
+
+	<div id="menuContainer" style="border-radius: 4px;">
+		<div class="div-table">
+			<div class="div-table-row">
+				
+				<div class="div-table-col1">
+					<div id="categoriesContainer" class="container">
+						<span id="categoriesTitle" class="title">Categories</span>
+						<div id="categoriesSubContainer">
+							
+						</div>
+					</div>
+				</div>
+				
+				<div id="col2" class="div-table-col2">
+				
+					<div id="topicsContainer" class="container">
+						<span id="topicsTitle" class="title"></span> 
+						<div id="topicsSubContainer">
+						
+						</div>
+					</div>
+					
+					<div id="quizContainer" style="display:none" class="container">
+						<span id="quizTitle" class="title">Quiz</span>
+						<br><span id="quizTitleQuestion" class="title2">Question</span>
+						<div id="quizSubContainer">
+							<p id="question" class="title3"></p>	
+								<div class="radioContainer">
+									
+									<label class="radioButtonContainer"><span id="answerA"></span>
+										<input type="radio" id="radio1" name="answer" value="a" onclick="validate()">
+										<span class="radioButtonCheckmark"></span>
+									</label>
+
+									<label class="radioButtonContainer"><span id="answerB"></span>
+										<input type="radio" id="radio2" name="answer" value="b" onclick="validate()">
+										<span class="radioButtonCheckmark"></span>
+									</label>
+
+									<label class="radioButtonContainer"><span id="answerC"></span>
+										<input type="radio" id="radio3" name="answer" value="c" onclick="validate()">
+										<span class="radioButtonCheckmark"></span>
+									</label>
+									
+									<input id="radio4" type="radio" name="answer" value="d" style="display:none">
+									
+									
+									
+									<span id="answer" style="font-size: 16px;"></span>
+								</div>
+								<br>
+								<div class="navContainer">
+									<div id="progressbarContainer">
+										<div id="progressbar"><div id="pbLabel" class="progress-label"></div></div>
+									</div>
+								</div>
+								<br>
+								<div class="navContainer">
+									<button id="btnValidate" class="button quizButton" onclick="validate()">Valider réponse</button> 
+									<button id="btnNextQuestion" class="button quizButton" onclick="setNextQuestion()">Question suivante</button>
+								</div>
+								
+						</div>
+						
+						<div id="statsContainer" class="questionStats" style="display: none;">
+							<p><span id="congratulation" class="title3">Bravo, vous avez terminé le quiz!</span><img id="smiley" src="styles/icons/smileys/smiley1.png" width="23" height="23"></p>
+							<p id="stats1" class="title3"></p>
+							<p id="stats2" class="title3"></p>
+							<br>
+							<div id="voteContainer">
+								<span id="voteTitle">Notez ce quiz</span> 
+									<div id="voteValue" class="ratingContainer" value="0" onclick="callbackVote(this)"></div>
+								<span id="voteLabel">note moyenne</span>
+							</div>
+							<br>
+							<a id="btnShowQuestionsStats" class="button" onclick="showQuestionsStats()">Montrer les stats</a>
+							<a id="btnRestart" class="button" onclick="restartQuiz()">Recommancer le quiz</a>
+							<div id="statsSubContainer" style="display: none;">
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</body>
+</html>
