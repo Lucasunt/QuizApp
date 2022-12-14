@@ -1,0 +1,608 @@
+		body 
+		{
+			font-family: arial;
+			background-color: #cf5;
+			color: #454545;			
+			background-image: url("backgrounds/bg1.png"); 
+            background-repeat: no-repeat;
+			background-size: 100% 100%;
+		}
+		html 
+		{
+			height: 100%
+		}
+		::-webkit-scrollbar 
+		{
+			width: 10px;
+		}
+			::-webkit-scrollbar-track {
+			background: #f1f1f1; 
+		}
+		::-webkit-scrollbar-thumb {
+			background: #7f7f7f;
+		}
+		::-webkit-scrollbar-thumb:hover {
+			background: #9f9f9f;
+		}
+		.left
+		{
+			float: left;
+		}	
+		.right
+		{	
+			margin-left: 5px;
+			float: right;
+		}	
+		.show
+		{
+			display: block;
+		}
+		.hide
+		{
+			display: none;
+		}
+		a#btnLang, a#btnProfil
+		{
+			text-decoration: underline;
+			cursor: pointer;
+			padding: 7px 5px;
+			margin-top: 7px;
+			color: #fff;
+			font-size: 16px;
+		}
+		a#btnLang
+		{
+			padding: 7px 3px;
+		}
+		label
+		{
+			margin-top: 5px;
+		}
+		.title
+		{
+			line-height: 180%;
+			font-size: 30px;
+		}
+		.title2
+		{
+			line-height: 180%;
+			font-size: 25px;
+		}
+		.title3
+		{
+			font-size: 20px;
+		}
+		.title4
+		{
+			font-size: 16px;
+		}
+		.title5
+		{
+			font-size: 17px;
+			margin-top: -10px;
+		}
+		table
+		{
+			min-width: 600px;
+			border-collapse: collapse;
+			border-radius: 5px;
+			overflow: hidden;
+		}
+		tr
+		{
+			border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+		}
+		tr:nth-child(odd)
+		{
+			background-color:rgba(255, 255, 255, 0.5);
+		}
+		tr:nth-child(even)
+		{
+			background-color:rgba(255, 255, 255, 0.5);
+		}
+		td
+		{
+			padding: 10px 15px;
+			vertical-align: top;
+			text-align: left;
+		}
+		hr
+		{
+			border-top: 1px dotted #c5c5c5;
+			margin-top: 10px;
+			margin-bottom: 20px;
+		}
+		.infos
+		{
+			font-size: 12px;
+		}
+		.categorieLabel
+		{
+			color: white;
+			background-color:rgba(0, 0, 0, 0.5);
+			border-radius: 10px;
+			padding: 1px 8px;
+			float:right;
+			border: solid 1px white;
+		}
+
+		.textLeft
+		{
+			padding-left: 10px;
+			text-align: left;
+		}
+		.topMargin
+		{
+			margin: 3px;
+		}
+		.topMargin2
+		{
+			margin-top: 10px;
+		}
+		.info
+		{
+			background-color:rgba(0, 0, 0, 0.5);
+			color: #fff;
+			font-size: 12px;
+			padding-left: 10px;
+			width: 500px;
+			height: 39px;
+			border: 1px solid #fff;
+			border-radius: 5px;
+			float: left;
+			display: table-column;         
+			overflow-y:auto;
+		}
+		.stepsRadButtons
+		{
+			background-color: #fff;
+			float: left;
+			      
+			width: 150px;
+			height: 20px;
+			cursor: pointer;
+			text-align: left; 
+			user-select: none;
+			padding: 10px 15px;
+			border-radius: 5px;
+			border: 1px solid #ccc;
+		}
+		.stepsRadButtons:hover
+		{
+			background-color: #eee;
+		}
+		input[type=text], input[type=search], textarea
+		{
+			font-size: 15px;
+			color: #454545;
+			width: 500px;
+			margin: 10px 0;
+			padding: 8px 15px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			box-sizing: border-box;
+		}
+		textarea 
+		{
+			font-family: arial;
+			height: 150px;
+			padding: 10px 15px;
+			resize: none;
+		}
+		input[type=text]:focus, textarea:focus, input[type="search"]:focus
+		{
+			box-shadow: 0 0 1px 0 #ccc;
+			border-color: #1183d6;
+			outline: none;
+		}		
+		.div-table 
+		{
+			display: table; 
+			margin: 0 auto;			
+			width: auto;            
+			border-spacing: 0px;
+			border: solid 1px #fff;
+			box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+			border-radius: 5px;
+		}
+		.div-table-row 
+		{
+			display: table-row;
+			width: auto;
+			clear: both;
+			border-radius: 5px;
+		}
+		.div-table-col1
+		{
+			background-color:rgba(255, 255, 255, 0.5);
+			float: left;
+			display: table-column;         
+			width: 240px;
+			height: 640px;
+			overflow-y:auto;
+			border-radius: 5px;
+		}
+		.div-table-col2
+		{
+			background-color:rgba(255, 255, 255, 0.5);
+			float: left;
+			display: table-column;         
+			width: 770px;         
+			height: 640px;
+			overflow-y:auto;
+		}
+		.container
+		{
+			padding: 10px 30px 10px 30px;
+			font-size: 15px;
+		}
+		.containerForm
+		{
+			background-color:rgba(255, 255, 255, 0.5);
+			margin: 0 auto;	
+			padding: 30px;
+			font-size: 15px;
+			width: 950px;         
+			height: 580px;
+			border: solid 1px #fff;
+			box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+			border-radius: 5px;
+		}
+		.container2, .banner
+		{
+			background-color:rgba(255, 255, 255, 0.5);
+			min-height: 100px;
+			margin: 0 auto;	
+			padding: 10px 30px 20px 30px;
+			font-size: 15px;
+			width: 950px;         
+			height: 580px;
+			border: solid 1px #fff;
+			box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+			border-radius: 5px;
+		}
+		.banner
+		{
+			height: 100px;
+			margin-bottom: 10px;
+			position: relative;
+		}
+		.questionMark
+		{
+			background-repeat: no-repeat;
+			background-position: -10px -10px;
+			background-image: url(../styles/icons/banner.png);
+			background-size: 150px 150px;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 130px;
+			height: 130px;
+			z-index: -1;
+		}
+		/*
+		.questionMark 
+		{
+			-webkit-animation-name: rotate;
+			-webkit-animation-duration:0.3s;
+			-webkit-animation-iteration-count:normal;
+			-webkit-animation-timing-function:linear;
+		}
+		@-webkit-keyframes rotate 
+		{
+			from {-webkit-transform:rotate(0deg);}
+			to {  -webkit-transform:rotate(360deg);}
+		}
+		@-moz-keyframes rotate 
+		{
+			from {-moz-transform:rotate(0deg);}
+			to {  -moz-transform:rotate(360deg);}
+		}
+		*/
+		.container3
+		{
+			background-color: white;
+			margin: 0 auto;	
+			font-size: 15px;
+			width: 650px;         
+		}
+		.radioContainer
+		{
+			display: table-cell;
+			height: 280px;
+			vertical-align: middle;
+			
+		}
+		.navContainer
+		{
+			width: 100%;
+			height: 50px;
+			margin: 0 auto;
+		}
+		.topicContainer
+		{
+			background-color:rgba(0, 0, 0, 0.5);
+			color:white;
+			margin: 0px 0px 10px 0px;
+			padding: 10px 15px;
+			line-height: 160%;
+			width: 678px; 
+			border: solid 1px #fff;
+			border-radius: 5px;
+		}
+		.topicContainer:hover
+		{
+			background-color:rgba(122, 122, 122, 0.5);
+			color:white;
+			cursor: pointer;
+		}
+		.ui-progressbar 
+		{
+			position: relative;
+		}
+		.progress-label 
+		{
+			position: absolute;
+			left: 42%;
+			top: 7px;
+		}
+		#voteContainer
+		{
+			background-color:rgba(0, 0, 0, 0.5);
+			color:white;
+			font-size: 12px;
+			width: 100px;
+			padding: 7px;
+			border: solid 1px #fff;
+			border-radius: 5px;
+		}
+		#voteContainer #voteLabel
+		{
+			font-size: 10px;
+		}
+		
+		.ratingContainer
+		{
+			width: 80px;
+		}
+		.ratingContainer>img 
+		{
+			padding-top: 5px;
+			width:20%;
+		}		
+		.profileButton, .smallButton, .button
+		{
+			background-color: rgba(0, 0, 0, 0.5);
+			color: #fff;
+			font-size: 16px;
+			border: 1px solid #fff;
+			padding: 10px;
+			width: 180px;
+			cursor: pointer;
+			border-radius: 5px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			margin-bottom: 2px; /*categories buttons space*/
+			user-select: none;
+		}
+		.smallButton
+		{
+			width: 30px;
+		}
+		.profileButton
+		{
+			width: 20px;
+			height: 17px;
+		}
+		.profileButton>img
+		{
+			width: 18px;
+			height: 18px;
+		}
+		.quizButton
+		{
+			width: 40%;
+			height: 50px;
+		}
+		.smallButton:hover, .button:hover
+		{
+			background-color:rgba(122, 122, 122, 0.5);
+		}
+		.smallButton:active ,.button:active 
+		{
+			background-color:rgba(122, 122, 122, 0.5);
+		}
+		#myProgress 
+		{
+			width: 950px;
+			border: solid 1px #fff;
+		}
+		#myBar 
+		{
+			width: 25%;
+			height: 10px;
+			background-color:rgba(0, 0, 0, 0.5);
+			line-height: 30px; 
+			color: white;
+		}
+		
+		
+		/* The radioButtonContainer */
+		.radioButtonContainer
+		{
+			display: block;
+			position: relative;
+			padding-left: 35px;
+			margin-bottom: 10px;
+			cursor: pointer;
+			font-size: 16px;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			border: solid 1px #ccc;
+			border-radius: 5px;
+			padding: 23px 20px 20px 60px;
+			background-color: #fff;
+			min-width: 250px;
+			margin-right: 5px;
+		}
+		
+		.radioButtonContainerSmall
+		{
+			display: -webkit-inline-box;
+			min-width: 200px;
+			padding: 23px 26px 20px 60px;
+			margin-bottom: 0px;
+		}
+
+		/* Hide the browser's default radio button */
+		.radioButtonContainer input 
+		{
+			position: absolute;
+			opacity: 0;
+			cursor: pointer;
+		}
+
+		/* Create a custom radio button */
+		.radioButtonCheckmark 
+		{
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 21px;
+			width: 21px;
+			background-color: #eee;
+			border-radius: 50%;
+			margin: 20px;
+		}
+
+		/* On mouse-over, add a grey background color */
+		.radioButtonContainer:hover input ~ .radioButtonCheckmark 
+		{
+			background-color: #ccc;
+		}
+
+		/* When the radio button is checked, add a blue background */
+		.radioButtonContainer input:checked ~ .radioButtonCheckmark 
+		{
+			background-color: #2196F3;
+		}
+
+		/* Create the indicator (the dot/circle - hidden when not checked) */
+		.radioButtonCheckmark:after 
+		{
+			content: "";
+			position: absolute;
+			display: none;
+		}
+
+		/* Show the indicator (dot/circle) when checked */
+		.radioButtonContainer input:checked ~ .radioButtonCheckmark:after 
+		{
+			display: block;
+		}
+
+		/* Style the indicator (dot/circle) */
+		.radioButtonContainer .radioButtonCheckmark:after 
+		{
+			top: 4px;
+			left: 4px;
+			width: 13px;
+			height: 13px;
+			border-radius: 50%;
+			background: white;
+		}
+		
+		/*Searchbar*/
+		
+		input[type=search]
+		{
+			font-size: 16px;
+			width: 450px;
+			max-width: 450px;
+			margin: 0px;
+			display: inline-block;
+			display: block;
+			padding: 10px 4px 10px 40px;
+			background: transparent url("../searchbar/search.png") no-repeat 17px center;
+			background-color: rgba(255, 255, 255, 1);
+		}
+		input[type="search"]::placeholder 
+		{
+		}
+		.inline-block-list  /* ul or ol with this class */
+		{
+			padding: 0px;
+			list-style-type: none;
+		}
+		#result 
+		{
+			margin-top: 0px;
+			width: 448px;
+			background-color: rgba(255, 255, 255, 1);
+			border: 1px solid #ccc;	
+			border-radius: 4px;
+			z-index: 100;
+			position: absolute;
+		}
+		#result ul 
+		{
+			margin: 0px;
+		}
+		#result ul li 
+		{
+			padding: 10px 4px 10px 40px;
+			background-image: url("../searchbar/search.png");
+			background-repeat: no-repeat;
+			background-position: 17px 10px;
+		}
+		#result ul li:hover, .liSelected
+		{			
+			cursor: pointer;
+			background-color: #eee;
+		}
+		#profileMenu 
+		{
+			margin-top: 38px;
+			right: 30px;
+			min-width: 150px;
+			background-color: rgba(0, 0, 0, 0.5);
+			color: #fff;
+			border: 1px solid #fff;
+			border-radius: 5px;
+			z-index: 100;
+			position: absolute;
+			cursor: pointer;
+			user-select: none;
+		}
+		#profileMenu ul 
+		{
+			margin: 0px;
+		}
+		#profileMenu ul li
+		{
+			padding: 10px 15px 10px 40px;
+			list-style: none;
+			margin: 0;
+			vertical-align: middle;
+		}
+		#profileMenu ul #liProfile
+		{
+			background: url("../styles/icons/profile2.small.png") no-repeat 17px center;
+
+		}
+		#profileMenu ul #liStats
+		{
+			background: url("../styles/icons/stats.small.png") no-repeat 17px center;
+		}
+		#profileMenu ul #liLogout
+		{
+			background: url("../styles/icons/logout.small.png") no-repeat 17px center;
+		}
+
+		#profileMenu ul #liProfile:hover, #profileMenu ul #liStats:hover, #profileMenu ul #liLogout:hover
+		{
+			background-color: rgba(255, 255, 255, 0.5);
+		}
