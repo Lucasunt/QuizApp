@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+	<meta charset="utf-8">
+	<title>My Quiz App</title>
+	<link rel="icon" type="image/x-icon" href="styles/icons/icon2.ico">
+	<link href="styles/Style.css" rel="stylesheet">
+		
+	<script src="steps/Steps.js"></script>
+	<link href="steps/Steps.css" rel="stylesheet">
+	<script src="translations/Translations.js"></script>
+	<script src="effects/effects.js"></script>
+		
+	<script src="searchbar/search.js"></script>
+	<script src="searchbar/keycode.js"></script>
+	
+	<script src="profileMenu/profileMenu.js"></script>
+		
+	<script>	
+		const minQuestions = 10;
+		const maxQuestions = 50;
+		const d = document;
+		
+		function init()
+		{
+			rotate('questionMark');
+			translate();
+		}
+
+		//vanilla js
+		function translate()
+		{
+			loadCatgerories();
+			
+			d.getElementById('btnPlay').innerHTML = getTranslation('btnPlay');
+			d.getElementById('btnCreate').innerHTML = getTranslation('btnCreate');
+			d.getElementById('tab1').innerHTML = getTranslation('tab1');
+			d.getElementById('selectCat').innerHTML = getTranslation('selectCat');
+			d.getElementById('tab2').innerHTML = getTranslation('tab2');
+			d.getElementById('fillFields').innerHTML = getTranslation('fillFields'); 
+			d.getElementById('title1').innerHTML = getTranslation('title1');
+			d.getElementById('description1').innerHTML = getTranslation('description1');
+			d.getElementById('tab3').innerHTML = getTranslation('tab3');
+			d.getElementById('defineQuestions').innerHTML = getTranslation('defineQuestions');
+			d.getElementById('questionId').innerHTML = getTranslation('questionId');
+			d.getElementById('answerA').innerHTML = getTranslation('answerA');
+			d.getElementById('answerB').innerHTML = getTranslation('answerB');
+			d.getElementById('answerC').innerHTML = getTranslation('answerC');
+			d.getElementById('rightAnswer1').innerHTML = getTranslation('rightAnswer1');
+			d.getElementById('addQuestion1').innerHTML = getTranslation('addQuestion1');
+			d.getElementById('tab4').innerHTML = getTranslation('tab4');
+			d.getElementById('summary').innerHTML = getTranslation('summary'); 
+			d.getElementById('baseData').innerHTML = getTranslation('baseData');  
+			d.getElementById('category2').innerHTML = getTranslation('category2');
+			d.getElementById('title2').innerHTML = getTranslation('title2');
+			d.getElementById('description2').innerHTML = getTranslation('description2');
+			d.getElementById('nbQuestions2').innerHTML = getTranslation('nbQuestions2');
+			d.getElementById('btnSaveQuiz').innerHTML = getTranslation('btnSaveQuiz');
+			d.getElementById('questions').innerHTML = getTranslation('questions');
+			d.getElementById('btnSaveQuestions').innerHTML = getTranslation('btnSaveQuestions');
+			d.getElementById('btnNext').innerHTML = getTranslation('btnNext');
+			d.getElementById('btnPrevious').innerHTML = getTranslation('btnPrevious');
+			d.getElementById('search').setAttribute('placeholder', getTranslation('search'));
+		}
+
+		//vanilla js
+		function loadDataStep3()
+		{
+			if (questionId > maxQuestions)
+			{
+				hideQuestions();
+				return;
+			}
+			d.getElementById('questionId').innerHTML = `${getTranslation('questionId')} ${questionsArray.length+1}:`;
+		}
+
+		//vanilla js
+		function loadDataStep4()
+		{
+			var catId = d.querySelector('input[name="catId"]:checked').value;
+			var catName = getCategoryName(catId);
+			d.getElementById('catName').innerHTML = catName;
+
+			var title = d.getElementById('ftitle').value;
+			d.getElementById('title').innerHTML = title;
+
+			var description = d.getElementById('fdescription').value;
+			d.getElementById('description').innerHTML = description;
+
+			var nbQuestions = questionsArray.length;
+			d.getElementById('nbQuestions').innerHTML = nbQuestions;
+
+			d.getElementById('questionsContainer').innerHTML = generateQuestionTable(questionsArray);
+		}
+		
+		//vanilla js
+		function generateQuestionTable(questions)
+		{
+			if (questions.length == 0)// < 10
+			{
+				alert(getTranslation('defineQuestions2'));
+				return '';
+			}
+		
+			var html = '';
+		
+			var questionNum = getTranslation('questionNum');
+			var question = getTranslation('question');
+			var answerA = getTranslation('answerA');
+			var answerB = getTranslation('answerB');
+			var answerC = getTranslation('answerC');
+			var rightAnswer1 = getTranslation('rightAnswer1');
+			var removeQuestion = getTranslation('removeQuestion');
+		
+			for (var i = 0; i < questions.length; i++)
+			{
+				html += '<table>';
+				html +=		'<tr>';
+				html +=			'<td style="width:110px"><span>'+questionNum+'</span></td><td><span>'+(i+1)+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+question+'</span></td><td><span>'+questions[i].question+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+answerA+'</span></td><td><span>'+questions[i].answerA+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+answerB+'</span></td><td><span>'+questions[i].answerB+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+answerC+'</span></td><td><span>'+questions[i].answerC+'</span></td>';
+				html +=		'</tr><tr>';
+				html +=			'<td><span>'+rightAnswer1+'</span></td><td><span>'+questions[i].rightAnswer+'</span></td>';
+				html +=		'</tr><tr style="border-bottom: none">';
+				html +=			'<td colspan=2><a href="javascript:deleteQuestion('+questions[i].id+')">'+removeQuestion+'</a></td>';
+				html +=		'</tr>';
+				html += '</table><br>';
+			}
+			return html;
+		}
+		
+		//vanilla js
+		function deleteQuestion(id)
+		{	
+			if (confirm(getTranslation('deleteQuestion')) == true) 
+			{
+				var index = getIndexOfQuestion(id);
+				if (index > -1)
+				{
+					questionsArray.splice(index, 1);
+					loadDataStep4();
+				}
+			} 
+		}
+		
+		//vanilla js
+		function getIndexOfQuestion(id) 
+		{
+			for (var i = 0; i < questionsArray.length; i++)
+			{
+				if (questionsArray[i].id == id)
+					return i;
+			}
+			return -1;
+		}
+
+		//vanilla js
+		var questionId = 1;
+		function addQuestion()
+		{
+			if (!document.forms['formQuestions'].reportValidity())
+				return;
+		
+			if (questionId > maxQuestions)
+			{
+				alert(getTranslation('maxQuestions'));
+				return;
+			}
+
+			var question1 = d.getElementById('fquestion').value;
+			var answerA = d.getElementById('fanswerA').value;
+			var answerB = d.getElementById('fanswerB').value;
+			var answerC = d.getElementById('fanswerC').value;
+			var rightAnswer = d.getElementById('frightAnswer').value.toLowerCase();
+			
+			questionsArray.push(new question(questionId, question1, answerA, answerB, answerC, rightAnswer));
+			
+			d.getElementById('fquestion').value = '';
+			d.getElementById('fanswerA').value = '';
+			d.getElementById('fanswerB').value = '';
+			d.getElementById('fanswerC').value = '';
+			d.getElementById('frightAnswer').value = '';
+			
+			if (questionId < maxQuestions)
+			{
+				d.getElementById('questionId').innerHTML = `${getTranslation('questionId')} ${questionId+1}:`;
+			}
+			if (questionId == maxQuestions)
+			{
+				alert(getTranslation('maxQuestions'));
+				hideQuestions();
+			}
+			questionId++;
+		}
+
+		//vanilla js
+		function hideQuestions()
+		{
+			d.getElementById("step3").style.display = "none";	
+			d.getElementById("fquestion").removeAttribute('required');
+			d.getElementById("frightAnswer").removeAttribute('required');
+		}
+
+		//vanilla js
+		var questionsArray = [];
+		class question 
+		{
+			constructor(id, question, answerA, answerB, answerC, rightAnswer) 
+			{
+				this.quizId = 0;
+				this.id = id;
+				this.question = question;
+				this.answerA = answerA;
+				this.answerB = answerB;
+				this.answerC = answerC;
+				this.rightAnswer = rightAnswer;
+			}
+		}
+
+		//vanilla js	
+		function submitQuiz()
+		{			
+			var catId = d.querySelector('input[name="catId"]:checked').value;
+			var title = d.getElementById('ftitle').value;
+			var description = d.getElementById('fdescription').value;
+			var json = JSON.stringify(
+				{
+					CatId: catId,
+					Title: title,
+					Description: description
+				});
+			
+			var quizError = getTranslation('quizError');
+			var quizErrorTitleAlreadyExists = getTranslation('quizErrorTitleAlreadyExists');
+			var quizSuccess = getTranslation('quizSuccess');
+			
+			const request = new XMLHttpRequest();	
+			const url = 'http://localhost:5298/api/topics';
+			request.open("POST", url)
+			request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+			request.onreadystatechange = function() 
+			{
+				if (request.readyState == 4) 
+				{
+					if (request.status == 200) 
+					{
+						showMessage(`${quizSuccess}: ${request.response}`);
+						alert(`${quizSuccess}`);
+						setQuestionsQuizId(request.response);
+					}
+					else if (request.status == 409)
+					{
+						showMessage(`${quizErrorTitleAlreadyExists}`);
+						alert(`${quizErrorTitleAlreadyExists}`);
+					}
+					else
+					{
+						showMessage(`${quizError}: ${request.status}`);
+						alert(`${quizError}: ${request.status}`);
+					}
+				}
+			};
+			request.send(json);		
+		}
+				
+		//vanilla js
+		function showMessage(msg)
+		{
+			d.getElementById('serverResponses').insertAdjacentHTML('afterbegin', `${getTime()} ${msg} <br/>`);
+		}
+		
+		//vanilla js	
+		function submitQuestions()
+		{		
+			var questionsError = getTranslation('questionsError');//Erreur création des questions
+			var questionsSuccess = getTranslation('questionsSuccess'); //Création des questions ok: 
+		
+			if (questionsArray.length == 0) // < minQuestions
+			{
+				showMessage(`${questionsError}`);
+				return;
+			}
+				
+			if (questionsArray[0].quizId == 0)
+			{
+				showMessage(`${questionsError}`);
+				return;
+			}
+			
+			const request = new XMLHttpRequest();	
+			const url = 'http://localhost:5298/api/questions';
+			request.open("POST", url)
+			var json = JSON.stringify(questionsArray);
+			request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+			request.onreadystatechange = function() 
+			{
+				if (request.readyState == 4) 
+				{
+					if (request.status == 200) 
+					{
+						showMessage(`${questionsSuccess} : ${request.response}`);
+						resetForm();
+					}
+					else
+					{
+						showMessage(`${questionsError}: ${request.status}`);
+					}
+				}
+			};
+			request.send(json);		
+		}
+		
+		//vanilla js
+		function resetForm()
+		{
+			unsetRequiredFields();
+			d.getElementById('ftitle').value = '';
+			d.getElementById('fdescription').value = '';
+			questionsArray = [];
+			switchPanel(25);
+		}
+	
+		//vanilla js
+		function setQuestionsQuizId(id)
+		{
+			questionsArray.forEach(element => 
+			{
+				element.quizId = id
+			});
+		}
+		
+		//vanilla js
+		var categoriesArray = [];
+		class category 
+		{
+			constructor(catId, name) 
+			{
+				this.catId = catId;
+				this.name = name;
+			}
+		}
+		
+		//vanilla js
+		function getCategoryName(id)
+		{
+			var result = ''
+			
+			categoriesArray.forEach(element => 
+			{
+				if (element.catId == id) 
+				{
+					result = element.name;
+				}
+			});
+			return result;
+		}
+		
+		//vanilla js
+		function loadCatgerories()
+		{
+			d.getElementById('catButtons').innerHTML = '';
+			var catError = getTranslation('catError1');//Erreur lors du chargement des categories:
+			var catSuccess = getTranslation('catSuccess');//Catégories chargées ok
+		
+			const request = new XMLHttpRequest();
+			const url='http://localhost:5298/api/categories/';
+			request.open("GET", url + getLang());
+			request.send();
+			request.onprogress = function(event) 
+			{
+				//console.log(`Loaded ${event.loaded} of ${event.total}`);
+			};
+			request.onload = function() 
+			{
+				var data = JSON.parse(request.response);
+				var html = '';
+				for (i = 0; i < data.length; i++)
+					{
+						categoriesArray.push(new category(data[i].id, data[i].name));
+					
+						var rbName = 'rad'+i;
+						var br = (i%2 == 0 && i > 0) ? '<br>' : '';
+						html += '<label class="radioButtonContainer radioButtonContainerSmall"><span> '+data[i].name+'</span><input type="radio" id="radio1" name="catId" value="'+data[i].id+'" required><span class="radioButtonCheckmark"></span></label>';
+					}
+				d.getElementById('catButtons').innerHTML = html;
+			};
+			request.onerror = function() 
+			{
+				alert(getTranslation('dialogLoadingCatError'));
+				showMessage(getTranslation('dialogLoadingCatError'));
+			};
+		}
+		
+		//vanilla js
+		function getTime()
+		{	
+			var today = new Date();
+			var hours = String(today.getHours()).padStart(2, '0');
+			var minutes = String(today.getMinutes()).padStart(2, '0');
+			var seconds = String(today.getSeconds()).padStart(2, '0');
+			return hours + ":" + minutes + ":" + seconds;
+		}
+		
+	</script>
+</head>
+
+<body onload="init()">
+	
+	<div class="banner">
+		<div id="questionMark" class="questionMark"></div>
+		<span class="title">My Quiz App</span>&nbsp;<span id="version">V3</span>
+		<div class="right">
+			<a id="btnProfile" class="profileButton right" onclick="showProfileMenu()"><img src="styles/icons/profile2.png"></a>
+			<div id="profileMenu" class="hide" onmouseover="console.log('profileMenu')" onmouseleave="hideProfileMenu()">
+				<ul class="inline-block-list">
+					<li id="liProfile" onclick="showProfile()">Profile</li>   
+					<li id="liStats" onclick="showStats()">Stats</li>
+					<li id="liLogout" onclick="logout()">Déconnexion</li>
+				</ul>
+			</div>
+		</div>
+		<a id="btnLang" class="right" onclick="setLang('fr')">fr</a>
+		<a id="btnLang" class="right" onclick="setLang('de')">de</a>
+		
+		<br><br>
+		<a id="btnPlay" class="button" href="play.html">Jouer</a>
+		<a id="btnCreate" class="button" href="form.html">Créer quiz</a>
+		<div class="right">
+			<input id="search" type="search" onKeyUp="showResults(this.value)" onfocus="searchFocus()" onfocusout="searchFocusOut(window.event)" placeholder="Search..." autocomplete="off" maxlength="50"/>
+			<div id="result" class="hide"></div>
+		</div>
+	</div>
+	
+	<div class="containerForm">
+	
+		<div id="myProgress"><div id="myBar" value="25"></div></div>
+		<div id="tab1" class="stepsTabs stepsActive" onclick="switchPanel(25)">1. Catégorie</div>
+		<div id="tab2" class="stepsTabs" onclick="switchPanel(50)">2. Données de base</div>
+		<div id="tab3" class="stepsTabs" onclick="switchPanel(75)">3. Questions</div>
+		<div id="tab4" class="stepsTabs" style="width:235px" onclick="switchPanel(100)">4. Finalisation</div> 
+		
+				<div class="stepsMainContainer">
+				
+				<form action="javascript:void(0);" id="formQuiz">
+					<div class="stepsContainer" id="step1" style="display:block">
+						<div class="stepsContent" id="StepCt1">
+							<p id="selectCat" class="title5">Veuillez sélectionner une catégorie:</p>
+							<div id="catButtons">
+							
+							</div>
+						</div>	
+					</div>
+					<div class="stepsContainer" id="step2" style="display:none">
+						<div class="stepsContent">
+							<p id="fillFields" class="title5">Veuillez saisir les champs suivants:</p>
+							<span id="title1">Titre:</span><br>
+							<input type="text" id="ftitle" name="title" autocomplete="off" maxlength="50"><br>
+							<span id="description1">Description:</span><br>
+							<textarea id="fdescription" name="description" autocomplete="off" maxlength="300"></textarea>
+							
+						</div>	
+					</div>
+				</form>
+					
+				<form action="javascript:void(0);" id="formQuestions">
+					<div class="stepsContainer" id="step3" style="display:none; overflow-y:hidden;">
+						<div class="stepsContent">
+							<p id="defineQuestions" class="title5">Veuillez définir les questions:</p>
+							
+							<span id="questionId">Question 1:</span><br>
+							<input type="text" id="fquestion" name="question" autocomplete="off" maxlength="200"><br> 
+							<span id="answerA">Réponse a:</span><br>
+							<input type="text" id="fanswerA" name="answerA" value="" autocomplete="off" maxlength="50"><br>
+							<span id="answerB">Réponse b:</span><br>
+							<input type="text" id="fanswerB" name="answerB" value="" autocomplete="off" maxlength="50"><br>
+							<span id="answerC">Réponse c:</span><br>
+							<input type="text" id="fanswerC" name="answerC" value="" autocomplete="off" maxlength="50"><br>
+							<span id="rightAnswer1">Bonne réponse:</span><br>
+							<input type="text" id="frightAnswer" name="rightAnswer" pattern="[A-Ca-c]{1}" maxlength="1" style="width: 50px;" autocomplete="off"><br>
+							<button id="addQuestion1" class="button" onclick="addQuestion();">ajouter</button>
+							
+						</div>	
+					</div>
+				</form>
+					
+					<div class="stepsContainer" id="step4" style="display:none">
+						<div class="stepsContent">
+							<p id="summary" class="title5">Récapitulatif et finalisation du quiz:</p>
+								
+								<p id="baseData">Données de base:</p>
+								<table>
+									<tr>
+										<td style="width:110px"><span id="category2">Categorie:</span></td><td><span id="catName"></span></td>
+									</tr><tr>	
+										<td><span id="title2">Titre:</span></td><td><span id="title"></span></td>
+									</tr><tr>	
+										<td><span id="description2">Description:</span></td><td><span id="description"></span></td>
+									</tr>
+									</tr><tr style="border-bottom: none">	
+										<td><span id="nbQuestions2">Nb de questions:</span></td><td><span id="nbQuestions"></span></td>
+									</tr>
+								</table>
+							<br>
+							<button id="btnSaveQuiz" class="button textLeft topMargin" onclick="submitQuiz()">1. Enregistrer le quiz</button>
+							
+							<p id="questions">Questions:</p> 
+							
+							<div id="questionsContainer"></div>
+							<br>
+							<button id="btnSaveQuestions" class="button textLeft topMargin" onclick="submitQuestions()">2. Enregistrer les questions</button>
+							
+						</div>	
+					</div>
+				</div>
+				<br>
+				
+				<div class="left">
+					<div id="serverResponses" class="info"></div>
+				</div>
+				
+				<div class="right">
+					<a id="btnPrevious" class="button" onclick="setPreviousTab()">&#60;&nbsp;précédent</a>
+					<a id="btnNext" class="button" onclick="setNextTab()">suivant&nbsp;&#62;</a>
+				</div>
+			
+	</div>
+				
+</body>
+</html>
